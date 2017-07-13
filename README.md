@@ -54,7 +54,7 @@ This application requires the following external dependencies.
 
 ## Authentication
 
-When `debug` is set to false, a valid auth token will be required to use this API. The token must be a valid JWT token signed using the `jwt.secret  value. This value must be passed in the `Authentication` header along with all requests, other than the health check.
+When `debug` is set to false, a valid auth token will be required to use this API. The token must be a valid JWT token signed using the `jwt.secret`  value. This value must be passed in the `Authorization` header along with all requests, other than the health check.
 
 ## Usage
 
@@ -106,7 +106,7 @@ There are three routes available for use in this API.
 
 - `GET /v1/streams/{id}`
 
-    Retrieve a single stream. Note that ID string are assumed to be 24 character hex encoded streams! All other ID formats will result in a 404 error.
+    Retrieve a single stream. Note that the ID string is assumed to be 24 character hex encoded stream! All other ID formats will result in a 404 error.
 
     ```
     HTTP/1.1 200 OK
@@ -145,7 +145,7 @@ This application is bootstrapped a bit differently than most Slim applications.
 - Controllers and middleware are lazy loaded from the DI Container when a route is matched.
 - Routes are comprised of a simple stack of callable middleware and controllers.
 
-While this application does not cache the DI container or routes, it't not a good idea to do that in a production application as it is much slower. Normally, the DI container should be compiled and cached to a file and the routes should be cached to a file. This greatly improves performance.
+While this application does not cache the DI container or routes, it's not a good idea to do this in production as it is much slower. Normally, the DI container and routes should be compiled and cached to a file. This will greatly improve performance.
 
 This application is organized into the following structure.
 
