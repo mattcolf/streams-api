@@ -1,0 +1,37 @@
+#!/usr/bin/env php
+<?php
+
+namespace MC\StreamsAPI;
+
+use Firebase\JWT\JWT;
+use MC\StreamsAPI\Bootstrap\Container;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
+$root = __DIR__ . '/../';
+
+require_once $root . 'vendor/autoload.php';
+
+/**
+ * Get the DI Container
+ *
+ * @var $container ContainerInterface
+ */
+$container = Container::load($root);
+
+/**
+ * The configured JWT secret
+ *
+ * @var $secret string
+ */
+$secret = $container->getParameter('jwt.secret');
+
+echo "Here is a JWT based auth token you can use.\n";
+echo "Just include it in the 'Authorization' header when sending a request.\n";
+
+$token = JWT::encode([
+    // normally, there would be some helpful data here (user id, create time, expires time, etc)
+    'a' => 'b',
+    'c' => 'd'
+], $secret);
+
+echo sprintf("\n%s\n", $token);

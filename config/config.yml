@@ -1,0 +1,102 @@
+# Main Configuration File
+# In a real application, this would normally be split up over multiple files.
+
+imports:
+    - resource: 'slim.yml'
+
+parameters:
+
+    # Whether the application should be run in debug more or not
+    # Note that when debug mode is disabled, API authentication will be required.
+    debug: true
+
+    # Slim Settings
+    settings:
+        displayErrorDetails: '%debug%'
+
+    # Streams Fixture URI
+    stream.fixture.uri: 'https://raw.githubusercontent.com/discovery-digital/svc-codingchallenge/master/data/streams-mongoexport.json'
+
+    # Stream Ad Service URI
+    stream.ad.service.uri: 'https://gruesome-rate-3945.nanoscaleapi.io/v1/codingchallenge/ads/%s'
+
+    # The JWT shared secret
+    # Normally, secrets like this should not be stored in static configuration files. Instead
+    # they should be read from the environment or a trusted secret store/vault.
+    jwt.secret: 'TbLGyEzSkkY3RRBzEQcnpXzEdmttWvoIPcb7kX4BMEwLIBmMaWB1Ocfjs1Bktcs'
+
+    # Routes
+    routes:
+
+        root:
+            method: 'GET'
+            route: '/'
+            stack:
+                - 'controller.root'
+
+        streams:
+            method: 'GET'
+            route: '/v1/streams'
+            stack:
+                - 'middleware.authentication'
+                - 'controller.streams'
+
+        stream:
+            method: 'GET'
+            route: '/v1/streams/{stream:[0-9a-f]{24}}'
+            stack:
+                - 'middleware.authentication'
+                - 'controller.stream'
+
+services:
+
+    # Route Loader
+    route.loader:
+        class: 'MC\StreamsAPI\Bootstrap\RouteLoader'
+        arguments:
+            - '%routes%'
+
+    # Stream Data Repository
+    repository.stream:
+        class: 'MC\StreamsAPI\Data\FixtureStreamRepository'
+        arguments:
+            - '@guzzle'
+            - '%stream.fixture.uri%'
+            - '@service.stream.ads'
+
+    # Stream Ad Service
+    service.stream.ads:
+        class: 'MC\StreamsAPI\Data\Service\AdService'
+        arguments:
+            - '@guzzle'
+            - '%stream.ad.service.uri%'
+
+    # Guzzle HTTP Client
+    guzzle:
+        class: 'GuzzleHttp\Client'
+
+    # Root Controller
+    controller.root:
+        class: 'MC\StreamsAPI\Controller\RootController'
+
+    # Streams Controller
+    controller.streams:
+        class: 'MC\StreamsAPI\Controller\StreamsController'
+        arguments:
+            - '@repository.stream'
+
+    # Stream Controller
+    controller.stream:
+        class: 'MC\StreamsAPI\Controller\StreamController'
+        arguments:
+            - '@repository.stream'
+
+    # Authentication Middleware
+    middleware.authentication:
+        class: 'MC\StreamsAPI\Middleware\AuthenticationMiddleware'
+        arguments:
+            - '%jwt.secret%'
+            - '%debug%'
+
+
+

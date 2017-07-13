@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -e
+
+DIR=$( cd "$( dirname "$0" )" && pwd )
+
+PHP=$( which php )
+ROOT="$DIR/../public"
+
+SERVER=$1
+
+if [ -z $SERVER ];then
+    SERVER="0.0.0.0:8080"
+fi
+
+"$PHP" -S $SERVER -t $ROOT
